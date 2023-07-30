@@ -19,14 +19,12 @@ curl --request PUT \
 	"status": "ok"
 }'
 
-
 curl --request PUT \
 	--url http://localhost:3000/collection/cluster/cluster1 \
 	--header 'Content-Type: application/json' \
 	--data '{
 	"status": "ok"
 }'
-
 
 curl --request PUT \
 	--url http://localhost:3000/collection/db/mongodb \
@@ -52,4 +50,18 @@ curl --request PUT \
 	"size": 100,
 	"account": "1234567890",
 	"bucket": "my-bucket"
+}'
+
+curl --request PUT 'http://localhost:3000/collection/deployment/backend' \
+	--header 'Content-Type: application/json' \
+	--data '{
+    "language": "go",
+    "openapi": "backend/api/swagger.json",
+    "upstream": ["frontend"],
+    "downstream": ["db", "cache"],
+    "owner": "jack",
+    "status": "ok",
+    "repository": "https://gitlab.com/myusername/myrepo",
+    "branch": "master",
+    "commit_hash": "abcdef123456"
 }'

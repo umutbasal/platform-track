@@ -1,0 +1,21 @@
+variables:
+  COLLECTION_URL: "http://localhost:3000/collection/deployment/backend"
+
+example_deploy_job:
+  script:
+    - |
+      curl --request PUT $COLLECTION_URL \
+        --header 'Content-Type: application/json' \
+        --data '{
+          "language": "go",
+          "openapi": "backend/api/swagger.json",
+          "upstream": ["frontend"],
+          "downstream": ["db", "cache"],
+          "owner": "jack",
+          "status": "ok",
+          "repository": "'"$CI_REPOSITORY_URL"'",
+          "branch": "'"$CI_COMMIT_REF_NAME"'",
+          "commit_hash": "'"$CI_COMMIT_SHA"'"
+      }'
+  only:
+    - master # Replace this with the branch name you want to trigger this job for
