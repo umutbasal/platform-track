@@ -19,7 +19,7 @@
                 ]
             },
             "created_at": 1690685416,
-            "updated_at": 1690685932
+            "updated_at": 1690688946
         },
         "frontend": {
             "identifier": "frontend",
@@ -31,7 +31,7 @@
                 "status": "ok"
             },
             "created_at": 1690685416,
-            "updated_at": 1690685483
+            "updated_at": 1690688946
         },
         "worker": {
             "identifier": "worker",

@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"os/exec"
 	"regexp"
 	"strings"
 	"time"
@@ -178,13 +179,59 @@ func main() {
 	// fiber instance
 	app := fiber.New(
 		fiber.Config{
-			Concurrency: 1,
+			Concurrency: 10,
 		},
 	)
 
 	// routes
 	app.Get("/", func(c *fiber.Ctx) error {
 		return c.SendString("Hello, World 👋!")
+	})
+
+	app.Get("/ui", func(c *fiber.Ctx) error {
+
+		paths := []string{}
+
+		ls, err := ioutil.ReadDir("./")
+		if err != nil {
+			return c.SendStatus(500)
+		}
+
+		lsc, err := ioutil.ReadDir("./collection")
+		if err != nil {
+			return c.SendStatus(500)
+		}
+
+		for _, f := range ls {
+			if strings.Contains(f.Name(), ".json") || strings.Contains(f.Name(), "data") {
+				paths = append(paths, f.Name())
+			}
+		}
+
+		for _, f := range lsc {
+			if strings.Contains(f.Name(), ".json") {
+				paths = append(paths, "collection/"+f.Name())
+			}
+		}
+
+		iframes := []string{}
+
+		for _, p := range paths {
+			p = strings.Replace(p, ".jsonl", ".html", 1)
+			p = strings.Replace(p, ".json", ".html", 1)
+			p = strings.Replace(p, ".sh", ".html", 1)
+			p = "http://localhost:3000/" + p
+			iframes = append(iframes, `<iframe width="33%" height="500px" src="`+p+`"></iframe>`)
+		}
+
+		site := `
+		<!DOCTYPE html>
+		<html lang="en">
+		` + strings.Join(iframes, "") + styles + ` 
+		</html>`
+
+		c.Type("html")
+		return c.Send([]byte(site))
 	})
 
 	// put collection
@@ -203,6 +250,42 @@ func main() {
 
 		store.CreateOrUpdateItem(collection, identifier, payload)
 		return c.JSON(payload)
+	})
+
+	execSh := func(path string) string {
+		ls, err := ioutil.ReadDir("./")
+		if err != nil {
+			return ""
+		}
+
+		for _, f := range ls {
+			if strings.Contains(f.Name(), path) {
+				// execute sh script
+				exc, err := exec.Command("sh", f.Name()).Output()
+				if err != nil {
+					return ""
+				}
+
+				return string(exc)
+			}
+		}
+
+		return ""
+	}
+
+	app.Get("/data.*.json", func(c *fiber.Ctx) error {
+		// get matched sh script
+		path := c.Params("*")
+
+		return c.SendString(execSh(path))
+	})
+
+	app.Get("/data.*.html", func(c *fiber.Ctx) error {
+		// req to json
+		path := c.Params("*")
+
+		c.Type("html")
+		return c.Send([]byte(UI(execSh(path))))
 	})
 
 	app.Get("*.html", func(c *fiber.Ctx) error {
@@ -315,11 +398,15 @@ func UI(json string) string {
 	}, "*");
 	});
 	</script>
-	
-	<style>
+	` + styles
+}
+
+const styles = `
+<style>
 	body {
 	margin: 0;
 	padding: 0;
+	background: rgb(185, 187, 190);
 	}
 	
 	section {
@@ -349,7 +436,6 @@ func UI(json string) string {
 	}
 	</style>
 	`
-}
 
 func jsonLToJSON(jsonl []byte) []byte {
 	sl := strings.Split(string(jsonl), "\n")
