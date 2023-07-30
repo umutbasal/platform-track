@@ -263,6 +263,15 @@ func main() {
 
 		for _, f := range ls {
 			if strings.Contains(f.Name(), path) {
+
+				if !strings.Contains(f.Name(), ".sh") {
+					return ""
+				}
+
+				if !strings.Contains(f.Name(), "data") {
+					return ""
+				}
+
 				// execute sh script
 				exc, err := exec.Command("sh", f.Name()).Output()
 				if err != nil {
