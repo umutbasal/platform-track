@@ -217,11 +217,14 @@ func main() {
 		iframes := []string{}
 
 		for _, p := range paths {
+			pold := strings.TrimSuffix(p, ".json")
+			pold = strings.TrimSuffix(pold, ".jsonl")
+			pold = strings.TrimSuffix(pold, ".sh")
 			p = strings.Replace(p, ".jsonl", ".html", 1)
 			p = strings.Replace(p, ".json", ".html", 1)
 			p = strings.Replace(p, ".sh", ".html", 1)
 			p = "http://localhost:3000/" + p
-			iframes = append(iframes, `<iframe width="33%" height="500px" src="`+p+`"></iframe>`)
+			iframes = append(iframes, `<div class="q"><div class="p"><h2>`+pold+`</h2></div><iframe width="100%" height="100%" src="`+p+`"></iframe></div>`)
 		}
 
 		site := `
@@ -433,6 +436,17 @@ const styles = `
 	border: none;
 	width: 100%;
 	height: 100vh;
+	}
+
+	.p {
+		width: auto;
+		height: auto;
+	}
+
+	.q {
+		display: inline-block;
+		width: 33%;
+		height: 512px;
 	}
 	</style>
 	`
