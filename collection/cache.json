@@ -1,0 +1,16 @@
+{
+    "items": {
+        "redis": {
+            "identifier": "redis",
+            "properties": {
+                "status": "ok",
+                "type": "cluster",
+                "upstream": [
+                    "backend"
+                ]
+            },
+            "created_at": 1690685435,
+            "updated_at": 1690685483
+        }
+    }
+}

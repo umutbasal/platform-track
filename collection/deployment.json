@@ -1,0 +1,46 @@
+{
+    "items": {
+        "backend": {
+            "identifier": "backend",
+            "properties": {
+                "downstream": [
+                    "db",
+                    "cache"
+                ],
+                "language": "go",
+                "openapi": "backend/api/swagger.json",
+                "owner": "jack",
+                "status": "ok",
+                "upstream": [
+                    "frontend"
+                ]
+            },
+            "created_at": 1690685416,
+            "updated_at": 1690685483
+        },
+        "frontend": {
+            "identifier": "frontend",
+            "properties": {
+                "downstream": [
+                    "backend"
+                ],
+                "language": "javascript",
+                "status": "ok"
+            },
+            "created_at": 1690685416,
+            "updated_at": 1690685483
+        },
+        "worker": {
+            "identifier": "worker",
+            "properties": {
+                "language": "python",
+                "status": "ok",
+                "upstream": [
+                    "backend"
+                ]
+            },
+            "created_at": 1690685416,
+            "updated_at": 1690685417
+        }
+    }
+}

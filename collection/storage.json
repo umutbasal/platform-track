@@ -1,0 +1,15 @@
+{
+    "items": {
+        "s3-my-bucket": {
+            "identifier": "s3-my-bucket",
+            "properties": {
+                "account": "1234567890",
+                "bucket": "my-bucket",
+                "size": 100,
+                "status": "ok"
+            },
+            "created_at": 1690685483,
+            "updated_at": 1690685483
+        }
+    }
+}

@@ -1,0 +1,12 @@
+{
+    "items": {
+        "mongodb": {
+            "identifier": "mongodb",
+            "properties": {
+                "status": "ok"
+            },
+            "created_at": 1690685435,
+            "updated_at": 1690685483
+        }
+    }
+}
