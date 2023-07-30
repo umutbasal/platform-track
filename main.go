@@ -205,6 +205,57 @@ func main() {
 		return c.JSON(payload)
 	})
 
+	app.Get("*.html", func(c *fiber.Ctx) error {
+		path := c.Params("*")
+
+		paths := []string{`/collection\/[a-z]\/i`, "/logs/i"}
+
+		// regex match
+		for _, p := range paths {
+			if match, _ := regexp.MatchString(p, path); match {
+				c.Send([]byte("path not exist"))
+				return c.SendStatus(404)
+			}
+		}
+
+		// return file
+		f := "./" + path + ".json"
+
+		if path == "logs" {
+			f = "./logs.jsonl"
+		}
+
+		if _, err := os.Stat(f); os.IsNotExist(err) {
+			c.Send([]byte("f not existos"))
+			return c.SendStatus(404)
+		}
+
+		file, err := os.Open(f)
+		if err != nil {
+			c.Send([]byte("f cannot open"))
+
+			return c.SendStatus(500)
+
+		}
+
+		defer file.Close()
+
+		// read file
+		data, err := ioutil.ReadAll(file)
+		if err != nil {
+			c.Send([]byte("f cannot read"))
+			return c.SendStatus(500)
+		}
+
+		c.Type("html")
+
+		if path == "logs" {
+			return c.Send([]byte(UI(string(jsonLToJSON(data)))))
+		}
+
+		return c.Send([]byte(UI(string(data))))
+	})
+
 	// get
 	app.Get("/*", func(c *fiber.Ctx) error {
 		path := c.Params("*")
@@ -248,4 +299,59 @@ func main() {
 
 	// listen on port 3000
 	app.Listen(":3000")
+}
+
+func UI(json string) string {
+	return `<iframe id="jsoncrackEmbed" src="https://jsoncrack.com/widget"></iframe>
+
+	<script>
+	const jsonCrackEmbed = document.querySelector("iframe");
+	
+	const json = JSON.stringify(` + json + `);
+	
+	window?.addEventListener("message", (event) => {
+	jsonCrackEmbed.contentWindow.postMessage({
+		json
+	}, "*");
+	});
+	</script>
+	
+	<style>
+	body {
+	margin: 0;
+	padding: 0;
+	}
+	
+	section {
+	width: 100%;
+	height: 100vh;
+	display: flex;
+	flex-direction: column;
+	}
+	
+	textarea {
+	width: 100%;
+	height: 100%;
+	}
+	
+	div {
+	display: flex;
+	width: 100%;
+	height: 150px;
+	}
+	
+	#jsoncrackEmbed {
+	flex: 1;
+	order: 2;
+	border: none;
+	width: 100%;
+	height: 100vh;
+	}
+	</style>
+	`
+}
+
+func jsonLToJSON(jsonl []byte) []byte {
+	sl := strings.Split(string(jsonl), "\n")
+	return []byte("[" + strings.Join(sl, ",") + "]")
 }
